@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: i27-eureka-tst
+spec: 
+  replicas: 1
+  selector: 
+     matchLabels: 
+         name: i27-eureka-tst
+  template:
+    metadata: 
+      labels:
+        name: i27-eureka-tst
+    spec:
+      containers:
+      - name: i27-eureka-tst
+        # The below image should be dynamically changed based on the development
+        image: DIT # docker.io/amkommuaws123/eureka:644eed0
+
+---
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: i27-eureka-tst-svc
+spec:
+  selector:
+    name: i27-eureka-tst
+  ports:
+  - protocol: TCP
+    port: 80              # service port
+    targetPort: 8761      # ContainerPort
+  type: NodePort          # ClusterIp, LoadBalancer, NodePort

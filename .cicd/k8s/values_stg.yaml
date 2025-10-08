@@ -1,0 +1,9 @@
+name: i27-eureka
+fullname: i27-eureka-stg
+replicas:
+  default: 2
+image: 
+  name: flipcart01.jfrog.io/images-docker/eureka
+  tag: dev
+
+targetport: 8761 
