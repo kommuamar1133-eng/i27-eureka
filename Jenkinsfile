@@ -11,7 +11,7 @@ pipeline {
     environment {
         APPLICATION_NAME = 'eureka'
     }
-
+    //Stages
     stages {
         stage ('Build') {
             steps {
