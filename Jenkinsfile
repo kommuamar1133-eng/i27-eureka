@@ -9,15 +9,26 @@ pipeline {
         jdk 'JDK-17'
     }
     environment {
-        APPLICATION_NAME = 'eureka'
+        APPLICATION_NAME = "Eureka"
     }
     //Stages
     stages {
         stage ('Build') {
             steps {
-                echo "*******************************"
                 echo "Building the ${env.APPLICATION_NAME} Application"
                 sh 'mvn clean package -DskipTests=true'
+                // After building if you face any issue with mvn installation? --> There is issue with the permissions (chown -R <kommuamar1133>:<kommuamar1133> <apache maven) of maven in /opt/apcahe_maven
+            }
+        }
+        stage ('Sonar') {
+            steps {
+                sh """
+                echo "Starting Sonar Scan"
+                mvn sonar:sonar 
+                    -Dsonar.projectkey=i27-eureka 
+                    -Dsonar.host.url=http://34.46.61.109:9000/ 
+                    -Dsonar.login=squ_ecd1a5d6513762c30f73a9938c1a41823b88a49d
+                """
             }
         }
     }
