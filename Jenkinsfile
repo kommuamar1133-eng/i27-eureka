@@ -26,7 +26,7 @@ pipeline {
                 sh """
                 mvn sonar:sonar \
                     -Dsonar.projectkey=i27-eureka \
-                    -Dsonar.host.url=http://34.46.61.109:9000/ \
+                    -Dsonar.host.url=http://34.46.97.238:9000/ \
                     -Dsonar.login=squ_ecd1a5d6513762c30f73a9938c1a41823b88a49d
                 """
             }
