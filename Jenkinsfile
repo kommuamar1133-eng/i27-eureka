@@ -10,6 +10,8 @@ pipeline {
     }
     environment {
         APPLICATION_NAME = "Eureka"
+        SONAR_TOKEN = credentials('sonar_creds')
+        SONAR_URL = "http://34.46.97.238:9000"
     }
     //Stages
     stages {
@@ -23,12 +25,17 @@ pipeline {
         stage ('Sonar') {
             steps {
                 echo "Starting Sonar Scan"
-                sh """
-                mvn sonar:sonar \
-                    -Dsonar.projectkey=i27-eureka \
-                    -Dsonar.host.url=http://34.46.97.238:9000/ \
-                    -Dsonar.login=squ_ecd1a5d6513762c30f73a9938c1a41823b88a49d
-                """
+                withSonarQubeEnv('SonarQube'){  // The name you saved in system under manage jenkins
+                    sh """
+                    mvn sonar:sonar \
+                        -Dsonar.projectkey=i27-eureka \
+                        -Dsonar.host.url=${env.SONAR_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
+                }  
+                timeout (time: 2, unit: 'MINUTES'){
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
     }
