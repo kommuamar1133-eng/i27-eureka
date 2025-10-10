@@ -9,9 +9,13 @@ pipeline {
         jdk 'JDK-17'
     }
     environment {
-        APPLICATION_NAME = "Eureka"
+        APPLICATION_NAME = "eureka"
         SONAR_TOKEN = credentials('sonar_creds')
         SONAR_URL = "http://34.46.97.238:9000"
+        // https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#readmavenpom-read-a-maven-project-file
+        // If any errors with readMavenPom, make sure pipeline-utility-steps plugin is installed in your jenkins, if not do install it
+        POM_VERSION = readMavenPom().getVersion()
+        POM_PACKAGING = readMavenPom().getPackaging()
     }
     //Stages
     stages {
@@ -40,7 +44,10 @@ pipeline {
         }
         stage ('Docker') {
             steps {
-                echo "Currently in Docker stage"
+                // Existing artifact format: i27-eureka-0.0.1-SNAPSHOT.jar
+                // My Destination artifact format: i27-eureka-buildnumber-branchname.jar
+                echo "My JAR file SOURCE: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
+                echo "My JAR Destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
             }
         }
     }
