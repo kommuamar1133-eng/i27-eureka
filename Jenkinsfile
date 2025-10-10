@@ -55,6 +55,8 @@ pipeline {
                     echo "***********************Building Docker Image*************************"
                     pwd
                     ls -la
+                    cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}  ./.cicd
+                    ls -la ./.cicd
                     docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
                     # docker build -t imagename dockerfilepath
                 """
