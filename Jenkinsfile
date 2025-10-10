@@ -14,8 +14,11 @@ pipeline {
         SONAR_URL = "http://34.46.97.238:9000"
         // https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#readmavenpom-read-a-maven-project-file
         // If any errors with readMavenPom, make sure pipeline-utility-steps plugin is installed in your jenkins, if not do install it
+        // Script Approval issues : http://34.148.12.185:8080/scriptApproval/
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
+        DOCKER_HUB = "docker.io/kommuamar1133"
+
     }
     //Stages
     stages {
@@ -48,6 +51,13 @@ pipeline {
                 // My Destination artifact format: i27-eureka-buildnumber-branchname.jar
                 echo "My JAR file SOURCE: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
                 echo "My JAR Destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
+                sh """
+                    echo "***********************Building Docker Image*************************"
+                    pwd
+                    ls -la
+                    # docker build --no-cache -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} .cicd/opt/i27
+                    # docker build -t imagename dockerfilepath
+                """
             }
         }
     }
