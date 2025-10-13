@@ -18,6 +18,7 @@ pipeline {
         POM_VERSION = readMavenPom().getVersion()
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/kommuamar1133"
+        DOCKER_CREDS = credentials('dockerhub_creds')
 
     }
     //Stages
@@ -45,7 +46,7 @@ pipeline {
                 }
             }
         }
-        stage ('Docker') {
+        stage ('Docker Build & Push') {
             steps {
                 // Existing artifact format: i27-eureka-0.0.1-SNAPSHOT.jar
                 // My Destination artifact format: i27-eureka-buildnumber-branchname.jar
@@ -59,6 +60,12 @@ pipeline {
                     ls -la ./.cicd
                     docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
                     # docker build -t imagename dockerfilepath
+                    echo "***********************Login to Docker Registry*******************************"
+                    # docker login -u username -p password
+                    docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
+                    # docker push image_name
+                    docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+
                 """
             }
         }
