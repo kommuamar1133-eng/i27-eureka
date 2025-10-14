@@ -97,6 +97,34 @@ pipeline {
                 // docker run -dit --name eureka-test
                 // docker run -dit --name eureka-stage
         }
+        stage ('Deploy to Test-Server') {
+            steps {
+                echo "Deploy to Test"
+                withCredentials([usernamePassword(credentialsId: 'navya_ssh_dockerserver_creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    script {
+                        //sshpass -p password ssh -o StrictHostKeyChecking=no username@dockerserver_ip
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker pull ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+                        try {
+                            // Stop container
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker stop ${env.APPLICATION_NAME}-tst"
+                            // Remove Container
+                            sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip docker rm ${env.APPLICATION_NAME}-tst"
+                        }
+                        catch(err) {
+                            echo "Error Caught: $err"
+                        }
+                        //Create container
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker run -dit --name ${env.APPLICATION_NAME}-tst -p 5761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+                    }
+                }          
+            }
+                // create a container
+                // docker container create imagename
+                // docker run -dit --name containername -p hp:cp imagename
+                // docker run -dit --name eureka-dev
+                // docker run -dit --name eureka-test
+                // docker run -dit --name eureka-stage
+        }
     }
 }
 
