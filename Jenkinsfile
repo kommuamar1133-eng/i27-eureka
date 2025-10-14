@@ -19,7 +19,6 @@ pipeline {
         POM_PACKAGING = readMavenPom().getPackaging()
         DOCKER_HUB = "docker.io/kommuamar1133"
         DOCKER_CREDS = credentials('dockerhub_creds')
-
     }
     //Stages
     stages {
@@ -68,6 +67,30 @@ pipeline {
 
                 """
             }
+
+        }
+        stage ('Deploy to Dev') {
+            steps {
+                echo "Deploy to Dev"
+                withCredentials([usernamePassword(credentialsId: 'navya_ssh_dockerserver_creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    //sshpass -p password ssh -o StrictHostKeyChecking=no username@dockerserver_ip
+                    sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@dev_ip \"hostname -i\""
+                }
+            }
+            
         }
     }
 }
+
+//We need to connect to the dockerserver through the jenkinsslave using below command:
+//withCredentials([usernameColonPassword(credentialsId: 'mylogin', variable: 'USERPASS')]) {
+  // sshpass -p password ssh -o StrictHostKeyChecking=no username@dockerserver_ip
+
+
+
+// usernameVariable : String
+// Name of an environment variable to be set to the username during the build.
+// passwordVariable : String
+// Name of an environment variable to be set to the password during the build.
+// credentialsId : String
+// Credentials of an appropriate type to be set to the variable.
