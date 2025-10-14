@@ -74,12 +74,61 @@ pipeline {
                 echo "Deploy to Dev"
                 withCredentials([usernamePassword(credentialsId: 'navya_ssh_dockerserver_creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     //sshpass -p password ssh -o StrictHostKeyChecking=no username@dockerserver_ip
-                    sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"hostname -i\""
-                }
+                    sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker run -dit --name ${env.APPLICATION_NAME}-dev -p 5761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
             }          
+                }
+                // create a container
+                // docker container create imagename
+                // docker run -dit --name containername -p hp:cp imagename
+                // docker run -dit --name eureka-dev
+                // docker run -dit --name eureka-test
+                // docker run -dit --name eureka-stage
         }
     }
 }
+
+
+
+
+
+
+
+// container port = 8761
+
+// dev hp = 5761
+// tst hp = 6761
+// stg hp = 7761
+// prod hp = 8761
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //We need to connect to the dockerserver through the jenkinsslave using below command:
 //withCredentials([usernameColonPassword(credentialsId: 'mylogin', variable: 'USERPASS')]) {
