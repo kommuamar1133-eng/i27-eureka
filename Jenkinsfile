@@ -114,7 +114,7 @@ pipeline {
                             echo "Error Caught: $err"
                         }
                         //Create container
-                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker run -dit --name ${env.APPLICATION_NAME}-tst -p 5761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
+                        sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"docker run -dit --name ${env.APPLICATION_NAME}-tst -p 6761:8761 ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}\""
                     }
                 }          
             }
