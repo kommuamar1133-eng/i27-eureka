@@ -69,15 +69,14 @@ pipeline {
             }
 
         }
-        stage ('Deploy to Dev') {
+        stage ('Deploy to Dev-Server') {
             steps {
                 echo "Deploy to Dev"
                 withCredentials([usernamePassword(credentialsId: 'navya_ssh_dockerserver_creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     //sshpass -p password ssh -o StrictHostKeyChecking=no username@dockerserver_ip
-                    sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@dev_ip \"hostname -i\""
+                    sh "sshpass -p '$PASSWORD' -v ssh -o StrictHostKeyChecking=no $USERNAME@$dev_ip \"hostname -i\""
                 }
-            }
-            
+            }          
         }
     }
 }
