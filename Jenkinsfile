@@ -5,34 +5,13 @@ pipeline {
         label 'k8s-slave'
     }
     parameters {
-        choice(name: 'scan',
-            choices: ['no', 'yes'],
-            description: 'This will scan your application'
-        )
-        choice(name: 'buildOnly',
-            choices: ['no', 'yes'],
-            description: 'This will only build your application'
-        )
-        choice(name: 'dockerPush',
-            choices: ['no', 'yes'],
-            description: 'This will build dockerImage and push'
-        )
-        choice(name: 'deployToDev',
-            choices: ['no', 'yes'],
-            description: 'This will only Deploy the app to Dev env'
-        )
-        choice(name: 'deployToTest',
-            choices: ['no', 'yes'],
-            description: 'This will only Deploy the app to Test env'
-        )
-        choice(name: 'deployToStage',
-            choices: ['no', 'yes'],
-            description: 'This will only Deploy the app to stage env'
-        )
-        choice(name: 'deployToProd',
-            choices: ['no', 'yes'],
-            description: 'This will only Deploy the app to Prod env'
-        )
+        booleanParam(name: 'scan', defaultValue: false, description: 'This will scan your application')
+        booleanParam(name: 'buildOnly', defaultValue: false, description: 'This will only build your application')
+        booleanParam(name: 'dockerPush', defaultValue: false, description: 'This will build dockerImage and push')
+        booleanParam(name: 'deployToDev', defaultValue: false, description: 'This will only Deploy the app to Dev env')
+        booleanParam(name: 'deployToTest', defaultValue: false, description: 'This will only Deploy the app to Test env')
+        booleanParam(name: 'deployToStage', defaultValue: false, description: 'This will only Deploy the app to stage env')
+        booleanParam(name: 'deployToProd', defaultValue: false, description: 'This will only Deploy the app to Prod env')
     }
     tools {
         maven 'Maven-3.9.11'
