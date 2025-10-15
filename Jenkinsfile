@@ -6,31 +6,31 @@ pipeline {
     }
     parameters {
         choice(name: 'scan',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will scan your application'
         )
         choice(name: 'buildOnly',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will only build your application'
         )
         choice(name: 'dockerPush',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will build dockerImage and push'
         )
         choice(name: 'deployToDev',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will only Deploy the app to Dev env'
         )
         choice(name: 'deployToTest',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will only Deploy the app to Test env'
         )
         choice(name: 'deployToStage',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will only Deploy the app to stage env'
         )
         choice(name: 'deployToProd',
-            choices: 'yes/nno',
+            choices: 'no/nyes',
             description: 'This will only Deploy the app to Prod env'
         )
     }
@@ -162,7 +162,7 @@ pipeline {
 }
 
 
-
+//
 def buildApp(){
     return {
         echo "Building the ${env.APPLICATION_NAME} Application"
@@ -171,6 +171,7 @@ def buildApp(){
     }
 }
 
+//
 def sonar(){
     return {
         echo "Starting Sonar Scan"
