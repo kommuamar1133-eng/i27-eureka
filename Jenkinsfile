@@ -14,23 +14,23 @@ pipeline {
             description: 'This will only build your application'
         )
         choice(name: 'dockerPush',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will build dockerImage and push'
         )
         choice(name: 'deployToDev',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will only Deploy the app to Dev env'
         )
         choice(name: 'deployToTest',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will only Deploy the app to Test env'
         )
         choice(name: 'deployToStage',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will only Deploy the app to stage env'
         )
         choice(name: 'deployToProd',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will only Deploy the app to Prod env'
         )
     }
