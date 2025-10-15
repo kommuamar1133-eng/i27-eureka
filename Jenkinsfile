@@ -4,6 +4,36 @@ pipeline {
     agent {
         label 'k8s-slave'
     }
+    parameters {
+        choice(name: 'scan',
+            choices: 'yes/nno'
+            description: 'This will scan your application'
+        )
+        choice(name: 'buildOnly',
+            choices: 'yes/nno'
+            description: 'This will only build your application'
+        )
+        choice(name: 'dockerPush',
+            choices: 'yes/nno'
+            description: 'This will build dockerImage and push'
+        )
+        choice(name: 'deployToDev',
+            choices: 'yes/nno'
+            description: 'This will only Deploy the app to Dev env'
+        )
+        choice(name: 'deployToTest',
+            choices: 'yes/nno'
+            description: 'This will only Deploy the app to Test env'
+        )
+        choice(name: 'deployToStage',
+            choices: 'yes/nno'
+            description: 'This will only Deploy the app to stage env'
+        )
+        choice(name: 'deployToProd',
+            choices: 'yes/nno'
+            description: 'This will only Deploy the app to Prod env'
+        )
+    }
     tools {
         maven 'Maven-3.9.11'
         jdk 'JDK-17'
@@ -23,6 +53,14 @@ pipeline {
     //Stages
     stages {
         stage ('Build') {
+            when {
+                anyOf {
+                    expression {
+                        params.dockerPush == 'yes'
+                        params.buildOnly == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     buildApp().call()
@@ -30,6 +68,15 @@ pipeline {
             }
         }
         stage ('Sonar') {
+            when {
+                anyOf {
+                    expression {
+                        params.scan == 'yes'
+                        params.buildOnly == 'yes'
+                        params.dockerPush == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     sonar().call()
@@ -37,6 +84,13 @@ pipeline {
             }
         }
         stage ('Docker Build & Push') {
+            when {
+                anyOf {
+                    expression {
+                        params.dockerPush == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     dockerBuildAndPush().call()
@@ -45,6 +99,13 @@ pipeline {
 
         }
         stage ('Deploy to Dev-Server') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToDev == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     // envDeploy, hostPort, contPort
@@ -53,6 +114,13 @@ pipeline {
             }
         }
         stage ('Deploy to Test-Server') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToTest == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     // envDeploy, hostPort, contPort
@@ -61,6 +129,13 @@ pipeline {
             }
         }
         stage ('Deploy to Stage-Server') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToStage == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     // envDeploy, hostPort, contPort
@@ -69,6 +144,13 @@ pipeline {
             }
         }
         stage ('Deploy to Prod-Server') {
+            when {
+                anyOf {
+                    expression {
+                        params.deployToProd == 'yes'
+                    }
+                }
+            }
             steps {
                 script {
                     // envDeploy, hostPort, contPort
