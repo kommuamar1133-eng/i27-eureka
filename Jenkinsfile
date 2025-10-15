@@ -24,48 +24,23 @@ pipeline {
     stages {
         stage ('Build') {
             steps {
-                echo "Building the ${env.APPLICATION_NAME} Application"
-                sh 'mvn clean package -DskipTests=true'
-                // After building if you face any issue with mvn installation? --> There is issue with the permissions (chown -R <kommuamar1133>:<kommuamar1133> <apache maven) of maven in /opt/apcahe_maven
+                script {
+                    buildApp().call()
+                }
             }
         }
         stage ('Sonar') {
             steps {
-                echo "Starting Sonar Scan"
-                withSonarQubeEnv('SonarQube'){  // The name you saved in system under manage jenkins
-                    sh """
-                    mvn sonar:sonar \
-                        -Dsonar.projectkey=i27-eureka \
-                        -Dsonar.host.url=${env.SONAR_URL} \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
-                }  
-                timeout (time: 2, unit: 'MINUTES'){
-                    waitForQualityGate abortPipeline: true
+                script {
+                    sonar().call()
                 }
             }
         }
         stage ('Docker Build & Push') {
             steps {
-                // Existing artifact format: i27-eureka-0.0.1-SNAPSHOT.jar
-                // My Destination artifact format: i27-eureka-buildnumber-branchname.jar
-                echo "My JAR file SOURCE: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
-                echo "My JAR Destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
-                sh """
-                    echo "***********************Building Docker Image*************************"
-                    pwd
-                    ls -la
-                    cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}  ./.cicd
-                    ls -la ./.cicd
-                    docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
-                    # docker build -t imagename dockerfilepath
-                    echo "***********************Login to Docker Registry*******************************"
-                    # docker login -u username -p password
-                    docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
-                    # docker push image_name
-                    docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
-
-                """
+                script {
+                    dockerBuildAndPush().call()
+                }
             }
 
         }
@@ -105,6 +80,60 @@ pipeline {
 }
 
 
+
+def buildApp(){
+    return {
+        echo "Building the ${env.APPLICATION_NAME} Application"
+        sh 'mvn clean package -DskipTests=true'
+        // After building if you face any issue with mvn installation? --> There is issue with the permissions (chown -R <kommuamar1133>:<kommuamar1133> <apache maven) of maven in /opt/apcahe_maven
+    }
+}
+
+def sonar(){
+    return {
+        echo "Starting Sonar Scan"
+        withSonarQubeEnv('SonarQube'){  // The name you saved in system under manage jenkins
+            sh """
+            mvn sonar:sonar \
+                -Dsonar.projectkey=i27-eureka \
+                -Dsonar.host.url=${env.SONAR_URL} \
+                -Dsonar.login=${SONAR_TOKEN}
+            """
+        }  
+        timeout (time: 2, unit: 'MINUTES'){
+            waitForQualityGate abortPipeline: true
+        }
+    }
+}
+
+// Method for docker build & push
+def dockerBuildAndPush(){
+    return {
+        // Existing artifact format: i27-eureka-0.0.1-SNAPSHOT.jar
+        // My Destination artifact format: i27-eureka-buildnumber-branchname.jar
+        echo "My JAR file SOURCE: i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}"
+        echo "My JAR Destination: i27-${env.APPLICATION_NAME}-${BUILD_NUMBER}-${BRANCH_NAME}.${env.POM_PACKAGING}"
+        sh """
+            echo "***********************Building Docker Image*************************"
+            pwd
+            ls -la
+            cp ${WORKSPACE}/target/i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING}  ./.cicd
+            ls -la ./.cicd
+            docker build --no-cache --build-arg JAR_SOURCE=i27-${env.APPLICATION_NAME}-${env.POM_VERSION}.${env.POM_PACKAGING} -t ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT} ./.cicd
+            # docker build -t imagename dockerfilepath
+            echo "***********************Login to Docker Registry*******************************"
+            # docker login -u username -p password
+            docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}
+            # docker push image_name
+            docker push ${env.DOCKER_HUB}/${env.APPLICATION_NAME}:${GIT_COMMIT}
+        """
+    }
+}
+
+
+
+
+// Method for deploying containers in diff envs
 def dockerDeploy(envDeploy, hostPort, contPort){
     return {
         echo "Deploying to $envDeploy Environment"
