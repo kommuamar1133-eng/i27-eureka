@@ -97,7 +97,7 @@ pipeline {
             steps {
                 script {
                     // envDeploy, hostPort, contPort
-                    dockerDeploy('prod', '8761', '8761').call()
+                    dockerDeploy('prd', '8761', '8761').call()
                 }       
             }
         }       
