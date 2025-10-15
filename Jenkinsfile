@@ -6,11 +6,11 @@ pipeline {
     }
     parameters {
         choice(name: 'scan',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will scan your application'
         )
         choice(name: 'buildOnly',
-            choices: 'no/nyes',
+            choices: 'no\nyes',
             description: 'This will only build your application'
         )
         choice(name: 'dockerPush',
