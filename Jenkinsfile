@@ -139,11 +139,16 @@ pipeline {
             when {
                 allOf {
                     anyOf {
-                        params.deployToStage == 'yes'
+                        expression {
+                            params.deployToStage == 'yes'
+                            //other condition
+                        }
                     }
                     anyOf {
-                        branch 'release/*'
-                        //other condition
+                        expression {
+                            branch 'release/*'
+                            //other condition
+                        }
                     }
                 }
             }
