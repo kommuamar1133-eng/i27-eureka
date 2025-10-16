@@ -138,14 +138,13 @@ pipeline {
             // }
             when {
                 allOf {
+                    // anyOf {
+                    //     expression {
+                    //         params.deployToStage == 'yes'
+                    //         //other condition
+                    //     }
+                    // }
                     anyOf {
-                        expression {
-                            params.deployToStage == 'yes'
-                            //other condition
-                        }
-                    }
-                    anyOf {
-                        expression {
                             branch 'release/*'
                             //other condition
                         }
