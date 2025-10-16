@@ -129,10 +129,21 @@ pipeline {
             }
         }
         stage ('Deploy to Stage-Server') {
+            // when {
+            //     anyOf {
+            //         expression {
+            //             params.deployToStage == 'yes'
+            //         }
+            //     }
+            // }
             when {
-                anyOf {
-                    expression {
+                allOf {
+                    anyOf {
                         params.deployToStage == 'yes'
+                    }
+                    anyOf {
+                        branch 'release/*'
+                        //other condition
                     }
                 }
             }
